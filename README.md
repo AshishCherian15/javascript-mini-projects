@@ -340,6 +340,24 @@ By completing these projects, you'll master:
 
 ---
 
+## ✅ LetsUpgrade Certificate Verification
+
+**Certificate Holder:** Ashish Cherian  
+**Organizer:** LetsUpgrade EdTech Pvt. Ltd.
+
+### Verified Workshop Completions
+
+| Workshop | Date | Date of Issue | Collaborators | Status |
+|---------|------|---------------|---------------|--------|
+| Make an Interactive "Guess the Number" Game | 5 February 2026 | 20 March 2026 | NSDC, Meta Developer Circles, GDG MAD | ✅ Completed |
+| Shopping Cart Calculator Essentials: Local Storage & Responsive UI | 2 February 2026 | 21 March 2026 | NSDC, Meta Developer Circles, GDG MAD | ✅ Completed |
+| View Transitions API Essentials Workshop | 12 January 2026 | 20 March 2026 | NSDC, Meta Developer Circles, GDG MAD | ✅ Completed |
+| URL SearchParams Essentials: Modern JS Mini Workshop | 27 January 2026 | Not specified | Not specified | ✅ Completed |
+
+**Verification Note:** All workshops are completed under LetsUpgrade technical training programs and reflected in this repository through assignment-based mini-project implementations.
+
+---
+
 ## 🌐 Live Deployments
 
 All projects are deployed on **Vercel** for instant live access:
