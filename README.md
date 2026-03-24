@@ -42,7 +42,7 @@ This repository contains **4 interactive JavaScript mini-projects** completed as
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 
-**[🎮 Play Live Demo](LIVE_DEMO_URL_1)**
+**[🎮 Play Live Demo](https://guess-the-number-game-lake.vercel.app/)**
 
 </div>
 
@@ -77,7 +77,7 @@ An interactive number guessing game where the computer generates a random number
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 
-**[🛍️ Try Live Demo](LIVE_DEMO_URL_2)**
+**[🛍️ Try Live Demo](https://shopping-cart-calculator-two.vercel.app/)**
 
 </div>
 
@@ -113,7 +113,7 @@ A fully functional shopping cart where you can add products with custom names, p
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 
-**[✨ View Live Demo](LIVE_DEMO_URL_3)**
+**[✨ View Live Demo](https://view-transitions-api-demo-jet.vercel.app/)**
 
 </div>
 
@@ -151,7 +151,7 @@ An elegant multi-view application demonstrating smooth animated transitions usin
 ![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=flat-square&logo=css3&logoColor=white)
 ![JavaScript](https://img.shields.io/badge/JavaScript-F7DF1E?style=flat-square&logo=javascript&logoColor=black)
 
-**[🌐 See Live Demo](LIVE_DEMO_URL_4)**
+**[🌐 See Live Demo](https://urlsearchparams-demo.vercel.app/)**
 
 </div>
 
@@ -346,10 +346,10 @@ All projects are deployed on **Vercel** for instant live access:
 
 | Project | Live Link | Status |
 |---------|-----------|--------|
-| 🎮 Guess Number | [Play Game](LIVE_DEMO_URL_1) | ✅ Live |
-| 🛒 Shopping Cart | [Try Cart](LIVE_DEMO_URL_2) | ✅ Live |
-| ✨ View Transitions | [View Demo](LIVE_DEMO_URL_3) | ✅ Live |
-| 🔗 URLSearchParams | [See Demo](LIVE_DEMO_URL_4) | ✅ Live |
+| 🎮 Guess Number | [Play Game](https://guess-the-number-game-lake.vercel.app/) | ✅ Live |
+| 🛒 Shopping Cart | [Try Cart](https://shopping-cart-calculator-two.vercel.app/) | ✅ Live |
+| ✨ View Transitions | [View Demo](https://view-transitions-api-demo-jet.vercel.app/) | ✅ Live |
+| 🔗 URLSearchParams | [See Demo](https://urlsearchparams-demo.vercel.app/) | ✅ Live |
 
 ---
 
