@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>View Transitions API – CSE Assignment</title>
+  <style>
+
+    /* basic reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 16px;
+      color: #333;
+    }
+
+    /* page heading */
+    h1 {
+      font-size: 1.6rem;
+      color: #1a73e8;
+      margin-bottom: 6px;
+      text-align: center;
+    }
+
+    .subtitle {
+      font-size: 0.88rem;
+      color: #888;
+      margin-bottom: 30px;
+      text-align: center;
+    }
+
+    /* nav tabs to switch views */
+    .nav-tabs {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .tab-btn {
+      padding: 10px 24px;
+      border: 2px solid #1a73e8;
+      border-radius: 8px;
+      background-color: transparent;
+      color: #1a73e8;
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.2s ease, color 0.2s ease;
+    }
+
+    .tab-btn.active {
+      background-color: #1a73e8;
+      color: white;
+    }
+
+    .tab-btn:hover:not(.active) {
+      background-color: #e8f0fe;
+    }
+
+    /* main content container */
+    #content-box {
+      background-color: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+      padding: 36px 32px;
+      max-width: 620px;
+      width: 100%;
+      min-height: 340px;
+
+      /* view-transition-name tells the browser to animate THIS element */
+      view-transition-name: content-area;
+    }
+
+    /* ── VIEW TRANSITION ANIMATIONS ──────────────────────
+       ::view-transition-old  = the snapshot of the OLD content
+       ::view-transition-new  = the snapshot of the NEW content
+       We fade old out and slide new in from the right.
+    ─────────────────────────────────────────────────── */
+    ::view-transition-old(content-area) {
+      animation: slideOutLeft 0.35s ease forwards;
+    }
+
+    ::view-transition-new(content-area) {
+      animation: slideInRight 0.35s ease forwards;
+    }
+
+    @keyframes slideOutLeft {
+      from { opacity: 1; transform: translateX(0); }
+      to   { opacity: 0; transform: translateX(-60px); }
+    }
+
+    @keyframes slideInRight {
+      from { opacity: 0; transform: translateX(60px); }
+      to   { opacity: 1; transform: translateX(0); }
+    }
+
+    /* ── HOME VIEW ─── */
+    .view-home h2 {
+      font-size: 1.5rem;
+      color: #1a73e8;
+      margin-bottom: 12px;
+    }
+
+    .view-home p {
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .home-cards {
+      display: flex;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    .home-card {
+      flex: 1 1 140px;
+      background-color: #e8f0fe;
+      border-radius: 10px;
+      padding: 18px 14px;
+      text-align: center;
+    }
+
+    .home-card .icon { font-size: 1.8rem; margin-bottom: 8px; }
+    .home-card p    { font-size: 0.85rem; color: #444; margin: 0; }
+
+    /* ── ABOUT VIEW ─── */
+    .view-about h2 {
+      font-size: 1.5rem;
+      color: #27ae60;
+      margin-bottom: 12px;
+    }
+
+    .view-about p {
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.7;
+      margin-bottom: 16px;
+    }
+
+    .about-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .about-list li {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background-color: #eafaf1;
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-size: 0.9rem;
+      color: #333;
+    }
+
+    .about-list li span {
+      font-size: 1.2rem;
+    }
+
+    /* ── CONTACT VIEW ─── */
+    .view-contact h2 {
+      font-size: 1.5rem;
+      color: #e67e22;
+      margin-bottom: 12px;
+    }
+
+    .view-contact p {
+      font-size: 0.95rem;
+      color: #555;
+      line-height: 1.7;
+      margin-bottom: 20px;
+    }
+
+    .contact-info {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .contact-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      background-color: #fff3e0;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 0.9rem;
+      color: #444;
+    }
+
+    .contact-row span { font-size: 1.3rem; }
+
+    /* fallback notice */
+    .fallback-notice {
+      margin-top: 18px;
+      background-color: #fff8e1;
+      border-left: 4px solid #f5a623;
+      padding: 10px 14px;
+      border-radius: 6px;
+      font-size: 0.82rem;
+      color: #7a5c00;
+      display: none;
+    }
+
+    /* responsive */
+    @media (max-width: 480px) {
+      #content-box { padding: 22px 16px; }
+      .nav-tabs     { gap: 8px; }
+      .tab-btn      { padding: 8px 14px; font-size: 0.85rem; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>🌐 View Transitions API</h1>
+  <p class="subtitle">Click the tabs below to switch views with smooth animations</p>
+
+  <!-- NAV TABS -->
+  <div class="nav-tabs">
+    <button class="tab-btn active" onclick="switchView('home', this)">🏠 Home</button>
+    <button class="tab-btn"       onclick="switchView('about', this)">👤 About</button>
+    <button class="tab-btn"       onclick="switchView('contact', this)">📬 Contact</button>
+  </div>
+
+  <!-- MAIN CONTENT BOX — only one view shows at a time -->
+  <div id="content-box">
+    <!-- default: home view loads first -->
+  </div>
+
+  <p class="fallback-notice" id="fallback-notice">
+    ⚠️ Your browser does not support the View Transitions API. Content is switching without animation.
+  </p>
+
+  <script>
+
+    /*
+     * INSIGHT (as required by assignment):
+     *
+     * 1. What the View Transitions API does:
+     *    It lets the browser take a screenshot of the current page state (old view),
+     *    then after a DOM update, animate the transition between old and new visually.
+     *    This is done using document.startViewTransition(() => { ... }).
+     *
+     * 2. Why it improves UX compared to instant DOM changes:
+     *    Without it, swapping content is abrupt and jarring — the user loses visual
+     *    context of what just changed. With View Transitions, the user sees a smooth
+     *    animation that makes the change feel natural, like flipping a page.
+     *
+     * 3. How view-transition-name works:
+     *    Assigning view-transition-name: content-area in CSS tells the browser to
+     *    specifically capture and animate THAT element, giving fine-grained control
+     *    over which parts of the page animate and how.
+     */
+
+    // all the view HTML stored as strings
+    const views = {
+
+      home: `
+        <div class="view-home">
+          <h2>🏠 Welcome to My Portfolio</h2>
+          <p>
+            Hi! I am a final year CSE student. This page demonstrates the
+            View Transitions API — a modern browser feature that animates
+            content changes without any external library.
+          </p>
+          <div class="home-cards">
+            <div class="home-card">
+              <div class="icon">💻</div>
+              <p>Web Development</p>
+            </div>
+            <div class="home-card">
+              <div class="icon">🤖</div>
+              <p>Machine Learning</p>
+            </div>
+            <div class="home-card">
+              <div class="icon">📱</div>
+              <p>Android Apps</p>
+            </div>
+          </div>
+        </div>
+      `,
+
+      about: `
+        <div class="view-about">
+          <h2>👤 About Me</h2>
+          <p>
+            I am currently in my final year of B.Tech in Computer Science &
+            Engineering. I enjoy building projects and learning new web technologies.
+          </p>
+          <ul class="about-list">
+            <li><span>🎓</span> B.Tech CSE — Final Year</li>
+            <li><span>📍</span> Karnataka, India</li>
+            <li><span>🛠️</span> Skills: HTML, CSS, JS, Python, React</li>
+            <li><span>🎯</span> Goal: Full Stack Developer</li>
+          </ul>
+        </div>
+      `,
+
+      contact: `
+        <div class="view-contact">
+          <h2>📬 Contact Me</h2>
+          <p>
+            Feel free to reach out for collaborations, project ideas, or just to say hello!
+          </p>
+          <div class="contact-info">
+            <div class="contact-row"><span>📧</span> student@example.com</div>
+            <div class="contact-row"><span>📞</span> +91 98765 43210</div>
+            <div class="contact-row"><span>💼</span> linkedin.com/in/student</div>
+            <div class="contact-row"><span>🐙</span> github.com/student</div>
+          </div>
+        </div>
+      `
+
+    };
+
+    // track which view is currently shown
+    let currentView = "home";
+
+    // load the home view on page load
+    document.getElementById("content-box").innerHTML = views["home"];
+
+    function switchView(viewName, clickedBtn) {
+
+      // do nothing if the user clicks the already active tab
+      if (viewName === currentView) return;
+
+      // update active tab button styling
+      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
+      clickedBtn.classList.add("active");
+
+      // check if View Transitions API is supported by this browser
+      if (!document.startViewTransition) {
+
+        // fallback for older browsers — just swap content directly
+        document.getElementById("content-box").innerHTML = views[viewName];
+        document.getElementById("fallback-notice").style.display = "block";
+        currentView = viewName;
+        return;
+      }
+
+      // USE THE VIEW TRANSITIONS API
+      // startViewTransition() captures the current screen, runs our DOM update,
+      // then animates between the old screenshot and the new content smoothly.
+      document.startViewTransition(() => {
+        document.getElementById("content-box").innerHTML = views[viewName];
+        currentView = viewName;
+      });
+
+    }
+
+  </script>
+
+</body>
+</html>

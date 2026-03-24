@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>URLSearchParams Demo</title>
+  <style>
+
+    /* basic reset */
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    /* theme variables — changed by JS based on ?theme= param */
+    body {
+      font-family: Arial, sans-serif;
+      background-color: var(--bg, #f0f4f8);
+      color: var(--text, #333);
+      min-height: 100vh;
+      padding: 30px 16px;
+      transition: background-color 0.4s, color 0.4s;
+    }
+
+    body.dark {
+      --bg:      #0f172a;
+      --text:    #e2e8f0;
+      --surface: #1e293b;
+      --border:  #334155;
+      --accent:  #60a5fa;
+      --muted:   #94a3b8;
+    }
+
+    body.light {
+      --bg:      #f0f4f8;
+      --text:    #1e293b;
+      --surface: #ffffff;
+      --border:  #e2e8f0;
+      --accent:  #1a73e8;
+      --muted:   #888;
+    }
+
+    .wrapper {
+      max-width: 760px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 22px;
+    }
+
+    /* heading */
+    h1 { font-size: 1.6rem; color: var(--accent, #1a73e8); margin-bottom: 4px; }
+    .sub { font-size: 0.85rem; color: var(--muted, #888); }
+
+    /* card */
+    .card {
+      background: var(--surface, #fff);
+      border: 1px solid var(--border, #e2e8f0);
+      border-radius: 12px;
+      padding: 22px 20px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+    }
+
+    .card h2 {
+      font-size: 1rem;
+      color: var(--accent, #1a73e8);
+      margin-bottom: 14px;
+      border-bottom: 2px solid var(--border, #e2e8f0);
+      padding-bottom: 8px;
+    }
+
+    /* param display grid */
+    .param-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 9px;
+    }
+
+    .param-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.9rem;
+    }
+
+    .param-key {
+      background: var(--accent, #1a73e8);
+      color: #fff;
+      border-radius: 5px;
+      padding: 3px 10px;
+      font-size: 0.78rem;
+      font-weight: bold;
+      min-width: 72px;
+      text-align: center;
+    }
+
+    .param-val {
+      color: var(--text, #333);
+      font-family: "Courier New", monospace;
+      font-size: 0.9rem;
+    }
+
+    .param-empty {
+      color: var(--muted, #aaa);
+      font-style: italic;
+      font-size: 0.85rem;
+    }
+
+    /* greeting box */
+    .greeting {
+      font-size: 1.15rem;
+      font-weight: bold;
+      color: var(--text, #333);
+      background: var(--bg, #f0f4f8);
+      border-radius: 8px;
+      padding: 14px 16px;
+      border-left: 4px solid var(--accent, #1a73e8);
+    }
+
+    /* url display */
+    .url-box {
+      background: var(--bg, #f0f4f8);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: "Courier New", monospace;
+      font-size: 0.82rem;
+      color: var(--text, #444);
+      word-break: break-all;
+      border: 1px solid var(--border, #e2e8f0);
+    }
+
+    /* action buttons */
+    .btn-row { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 16px; }
+
+    .btn {
+      padding: 9px 18px;
+      border-radius: 8px;
+      border: none;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: opacity 0.2s, transform 0.15s;
+    }
+    .btn:hover { opacity: 0.85; transform: scale(1.03); }
+    .btn-blue  { background: #1a73e8; color: #fff; }
+    .btn-green { background: #27ae60; color: #fff; }
+    .btn-red   { background: #e53935; color: #fff; }
+    .btn-gray  { background: #e2e8f0; color: #333; }
+
+    /* theme toggle */
+    .theme-toggle {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 0.88rem;
+      color: var(--muted, #888);
+    }
+
+    .toggle-btn {
+      padding: 7px 18px;
+      border-radius: 20px;
+      border: 2px solid var(--accent, #1a73e8);
+      background: transparent;
+      color: var(--accent, #1a73e8);
+      font-weight: bold;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+    .toggle-btn:hover {
+      background: var(--accent, #1a73e8);
+      color: #fff;
+    }
+
+    /* explanation box */
+    .explanation {
+      background: var(--bg, #f0f4f8);
+      border-radius: 8px;
+      padding: 14px 16px;
+      font-size: 0.88rem;
+      color: var(--text, #555);
+      line-height: 1.7;
+      border-left: 4px solid #27ae60;
+    }
+
+    .explanation strong { color: var(--accent, #1a73e8); }
+
+    /* try it form */
+    .try-row {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+    }
+    .try-row input {
+      flex: 1 1 120px;
+      padding: 9px 12px;
+      border-radius: 8px;
+      border: 1px solid var(--border, #ccc);
+      background: var(--bg, #f9f9f9);
+      color: var(--text, #333);
+      font-size: 0.88rem;
+      outline: none;
+    }
+
+    /* log area */
+    #log {
+      background: var(--bg, #f0f4f8);
+      border: 1px solid var(--border, #e2e8f0);
+      border-radius: 8px;
+      padding: 12px 14px;
+      font-family: "Courier New", monospace;
+      font-size: 0.8rem;
+      color: var(--text, #333);
+      min-height: 60px;
+      max-height: 160px;
+      overflow-y: auto;
+    }
+
+    footer {
+      text-align: center;
+      font-size: 0.78rem;
+      color: var(--muted, #aaa);
+      padding: 6px 0 16px;
+    }
+
+    @media (max-width: 480px) {
+      h1 { font-size: 1.3rem; }
+      .btn { padding: 8px 12px; font-size: 0.8rem; }
+    }
+
+  </style>
+</head>
+<body class="light">
+
+  <div class="wrapper">
+
+    <!-- title -->
+    <div>
+      <h1>🔗 URLSearchParams Demo</h1>
+      <p class="sub">URLSearchParams API — read, modify, and use URL query parameters</p>
+    </div>
+
+    <!-- ── SECTION 1: READ PARAMS ── -->
+    <div class="card">
+      <h2>1️⃣ Read URL Parameters</h2>
+      <p id="greeting" class="greeting" style="margin-bottom:14px;">Loading...</p>
+      <div class="param-grid" id="paramGrid">
+        <!-- filled by JS -->
+      </div>
+    </div>
+
+    <!-- ── SECTION 2: CURRENT URL ── -->
+    <div class="card">
+      <h2>🔍 Current URL Query String</h2>
+      <div class="url-box" id="urlDisplay">Loading...</div>
+    </div>
+
+    <!-- ── SECTION 3: MODIFY PARAMS ── -->
+    <div class="card">
+      <h2>2️⃣ Modify URL Parameters</h2>
+      <div class="btn-row">
+        <button class="btn btn-blue"  onclick="addCourse()">➕ Add course=javascript</button>
+        <button class="btn btn-green" onclick="updateTheme()">🔄 Toggle Theme Param</button>
+        <button class="btn btn-red"   onclick="removeCity()">🗑 Remove city param</button>
+        <button class="btn btn-gray"  onclick="resetURL()">↩ Reset URL</button>
+      </div>
+      <p style="font-size:0.82rem; color:var(--muted);">
+        Click buttons above to add, update, or remove query parameters. The URL and display update live.
+      </p>
+    </div>
+
+    <!-- ── SECTION 4: TRY IT YOURSELF ── -->
+    <div class="card">
+      <h2>🧪 Try It Yourself</h2>
+      <div class="try-row">
+        <input type="text" id="tryKey"   placeholder="Key (e.g. course)" />
+        <input type="text" id="tryValue" placeholder="Value (e.g. python)" />
+        <button class="btn btn-blue" onclick="trySetParam()">Set Param</button>
+        <button class="btn btn-red"  onclick="tryDeleteParam()">Delete Param</button>
+      </div>
+      <div id="log">// output will appear here...</div>
+    </div>
+
+    <!-- ── SECTION 5: THEME TOGGLE ── -->
+    <div class="card">
+      <h2>3️⃣ Dynamic Behavior — Theme Toggle</h2>
+      <div class="theme-toggle">
+        <span>Current theme:</span>
+        <strong id="themeLabel" style="color:var(--accent)">light</strong>
+        <button class="toggle-btn" onclick="toggleThemeUI()">Switch Theme</button>
+      </div>
+      <p style="font-size:0.82rem;color:var(--muted);margin-top:10px;">
+        The page applies light or dark mode based on the <code>?theme=</code> URL parameter automatically on load.
+      </p>
+    </div>
+
+    <!-- ── SECTION 6: EXPLANATION ── -->
+    <div class="card">
+      <h2>4️⃣ What is URLSearchParams?</h2>
+      <div class="explanation">
+        <strong>URLSearchParams</strong> is a built-in JavaScript Web API that makes it easy to read, add,
+        update, and delete key-value pairs from the query string part of a URL (the part after the <code>?</code>).
+        It works like a simple dictionary for URL parameters — no manual string splitting needed.
+        <br/><br/>
+        <strong>Real-world use case:</strong> E-commerce websites use URL query parameters for filters —
+        e.g. <code>?category=phones&brand=samsung&sort=price</code>. When a user shares or bookmarks this URL,
+        the same filters are applied again because the page reads the parameters using URLSearchParams on load.
+      </div>
+    </div>
+
+    <footer>Made by a CSE Final Year Student &nbsp;|&nbsp; URLSearchParams Assignment</footer>
+  </div>
+
+  <script>
+
+    /*
+     * EXPLANATION (as required by assignment):
+     *
+     * 1. What URLSearchParams is:
+     *    URLSearchParams is a JavaScript Web API that provides methods to work with the
+     *    query string of a URL. It lets you get(), set(), append(), delete() and iterate
+     *    over key-value pairs without manually parsing the URL string.
+     *
+     * 2. Real-world use case:
+     *    Search/filter pages use URLSearchParams to store the user's selected filters
+     *    in the URL. This lets users bookmark and share filtered results — e.g.
+     *    ?category=phones&sort=price — and the page reloads the same state from the URL.
+     */
+
+    // ── helper: get current params object ──
+    function getParams() {
+      return new URLSearchParams(window.location.search);
+    }
+
+    // ── helper: push updated params to the URL (no page reload) ──
+    function pushParams(params) {
+      const newURL = window.location.pathname + "?" + params.toString();
+      window.history.pushState({}, "", newURL);
+      renderAll();   // re-render everything after URL changes
+    }
+
+    // ── RENDER: show params on page ──
+    function renderParams() {
+      const params = getParams();
+      const grid   = document.getElementById("paramGrid");
+      const keys   = ["name", "city", "theme", "course"];
+      grid.innerHTML = "";
+
+      keys.forEach(key => {
+        const val = params.get(key);
+        const row = document.createElement("div");
+        row.className = "param-row";
+        row.innerHTML = `
+          <span class="param-key">${key}</span>
+          ${val
+            ? `<span class="param-val">${val}</span>`
+            : `<span class="param-empty">not set</span>`
+          }
+        `;
+        grid.appendChild(row);
+      });
+
+      // also show any extra params the user may have set
+      params.forEach((val, key) => {
+        if (!keys.includes(key)) {
+          const row = document.createElement("div");
+          row.className = "param-row";
+          row.innerHTML = `<span class="param-key" style="background:#27ae60">${key}</span><span class="param-val">${val}</span>`;
+          grid.appendChild(row);
+        }
+      });
+    }
+
+    // ── RENDER: greeting using name param ──
+    function renderGreeting() {
+      const params = getParams();
+      const name   = params.get("name");
+      const city   = params.get("city");
+      const el     = document.getElementById("greeting");
+
+      if (name && city) {
+        el.textContent = `👋 Hello ${name}! Welcome from ${city}.`;
+      } else if (name) {
+        el.textContent = `👋 Hello ${name}! Add ?city= to the URL to show your city.`;
+      } else {
+        el.textContent = `👋 Hello! Add ?name=YourName to the URL to get a personalized greeting.`;
+      }
+    }
+
+    // ── RENDER: url display box ──
+    function renderURL() {
+      const params  = getParams();
+      const display = document.getElementById("urlDisplay");
+      if (params.toString()) {
+        display.textContent = window.location.origin + window.location.pathname + "?" + params.toString();
+      } else {
+        display.textContent = window.location.origin + window.location.pathname + "  (no query params)";
+      }
+    }
+
+    // ── RENDER: apply theme from ?theme= param ──
+    function applyTheme() {
+      const theme = getParams().get("theme") || "light";
+      document.body.className = theme === "dark" ? "dark" : "light";
+      const label = document.getElementById("themeLabel");
+      if (label) label.textContent = theme === "dark" ? "dark" : "light";
+    }
+
+    // ── run all renders ──
+    function renderAll() {
+      renderParams();
+      renderGreeting();
+      renderURL();
+      applyTheme();
+    }
+
+    // ── SECTION 2 BUTTONS ──
+
+    // add course=javascript
+    function addCourse() {
+      const p = getParams();
+      p.set("course", "javascript");
+      pushParams(p);
+      logMsg("Added: course = javascript");
+    }
+
+    // toggle theme between light and dark
+    function updateTheme() {
+      const p     = getParams();
+      const cur   = p.get("theme") || "light";
+      const next  = cur === "dark" ? "light" : "dark";
+      p.set("theme", next);
+      pushParams(p);
+      logMsg(`Updated: theme = ${next}`);
+    }
+
+    // remove city param
+    function removeCity() {
+      const p = getParams();
+      if (p.has("city")) {
+        p.delete("city");
+        pushParams(p);
+        logMsg("Removed: city param");
+      } else {
+        logMsg("city param is not in the URL.");
+      }
+    }
+
+    // reset to default URL
+    function resetURL() {
+      const newURL = window.location.pathname + "?name=Ashish&city=Tiptur&theme=light";
+      window.history.pushState({}, "", newURL);
+      renderAll();
+      logMsg("Reset URL to defaults: name=Ashish&city=Tiptur&theme=light");
+    }
+
+    // ── SECTION 4: try it yourself ──
+    function trySetParam() {
+      const key = document.getElementById("tryKey").value.trim();
+      const val = document.getElementById("tryValue").value.trim();
+      if (!key) { logMsg("Please enter a key."); return; }
+      const p = getParams();
+      p.set(key, val || "");
+      pushParams(p);
+      logMsg(`Set: ${key} = "${val}"`);
+    }
+
+    function tryDeleteParam() {
+      const key = document.getElementById("tryKey").value.trim();
+      if (!key) { logMsg("Please enter a key to delete."); return; }
+      const p = getParams();
+      if (p.has(key)) {
+        p.delete(key);
+        pushParams(p);
+        logMsg(`Deleted: ${key}`);
+      } else {
+        logMsg(`"${key}" not found in URL.`);
+      }
+    }
+
+    // ── theme toggle button (UI only, also updates URL) ──
+    function toggleThemeUI() {
+      updateTheme();
+    }
+
+    // ── log helper ──
+    function logMsg(msg) {
+      const log = document.getElementById("log");
+      const line = document.createElement("div");
+      line.textContent = "> " + msg;
+      log.appendChild(line);
+      log.scrollTop = log.scrollHeight;
+    }
+
+    // ── on page load: set default params if URL has none ──
+    window.addEventListener("load", () => {
+      if (!window.location.search) {
+        window.history.replaceState({}, "", "?name=Ashish&city=Tiptur&theme=light");
+      }
+      renderAll();
+      logMsg("Page loaded. Reading params from URL...");
+      const p = getParams();
+      logMsg(`name="${p.get("name")}", city="${p.get("city")}", theme="${p.get("theme")}"`);
+    });
+
+    // listen for back/forward navigation
+    window.addEventListener("popstate", renderAll);
+
+  </script>
+
+</body>
+</html>

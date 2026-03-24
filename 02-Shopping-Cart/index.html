@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Shopping Cart Calculator</title>
+  <style>
+
+    /* basic reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      color: #333;
+      padding: 30px 16px;
+    }
+
+    h1 {
+      text-align: center;
+      font-size: 1.7rem;
+      color: #1a73e8;
+      margin-bottom: 6px;
+    }
+
+    .subtitle {
+      text-align: center;
+      font-size: 0.88rem;
+      color: #888;
+      margin-bottom: 28px;
+    }
+
+    /* main layout — two column on desktop */
+    .layout {
+      display: flex;
+      gap: 22px;
+      max-width: 960px;
+      margin: 0 auto;
+      flex-wrap: wrap;
+    }
+
+    /* ── INPUT PANEL ── */
+    .input-panel {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.09);
+      padding: 26px 22px;
+      flex: 1 1 280px;
+    }
+
+    .input-panel h2 {
+      font-size: 1.05rem;
+      color: #1a73e8;
+      margin-bottom: 18px;
+    }
+
+    label {
+      display: block;
+      font-size: 0.82rem;
+      font-weight: bold;
+      color: #555;
+      margin-bottom: 5px;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    input[type="text"],
+    input[type="number"] {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      background: #f9f9f9;
+      margin-bottom: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input:focus {
+      border-color: #1a73e8;
+      background: #fff;
+    }
+
+    .btn-add {
+      width: 100%;
+      padding: 12px;
+      background: #1a73e8;
+      color: #fff;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.3s, transform 0.2s;
+    }
+
+    .btn-add:hover {
+      background: #1558b0;
+      transform: scale(1.02);
+    }
+
+    /* error message */
+    .error-msg {
+      font-size: 0.82rem;
+      color: #e53935;
+      margin-top: 8px;
+      display: none;
+    }
+
+    /* ── CART PANEL ── */
+    .cart-panel {
+      background: #fff;
+      border-radius: 12px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.09);
+      padding: 26px 22px;
+      flex: 2 1 400px;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+    }
+
+    .cart-panel h2 {
+      font-size: 1.05rem;
+      color: #1a73e8;
+    }
+
+    /* cart table */
+    .cart-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    .cart-table th {
+      background: #e8f0fe;
+      color: #1a73e8;
+      padding: 10px 10px;
+      text-align: left;
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .cart-table td {
+      padding: 10px 10px;
+      border-bottom: 1px solid #f0f0f0;
+      color: #444;
+      vertical-align: middle;
+    }
+
+    .cart-table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .cart-table tr:hover td {
+      background: #fafafa;
+    }
+
+    /* item total cell */
+    .item-total {
+      font-weight: bold;
+      color: #27ae60;
+    }
+
+    /* delete button inside table */
+    .btn-delete {
+      background: #fdecea;
+      color: #e53935;
+      border: none;
+      border-radius: 6px;
+      padding: 4px 10px;
+      font-size: 0.8rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+
+    .btn-delete:hover {
+      background: #e53935;
+      color: #fff;
+    }
+
+    /* empty cart message */
+    .empty-msg {
+      text-align: center;
+      color: #aaa;
+      font-size: 0.9rem;
+      padding: 20px 0;
+    }
+
+    /* ── SUMMARY BAR ── */
+    .summary {
+      background: #f0f4f8;
+      border-radius: 10px;
+      padding: 16px 18px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .summary-item {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .summary-label {
+      font-size: 0.75rem;
+      color: #888;
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+    }
+
+    .summary-value {
+      font-size: 1.2rem;
+      font-weight: bold;
+      color: #1a73e8;
+    }
+
+    .grand-total .summary-value {
+      color: #27ae60;
+      font-size: 1.4rem;
+    }
+
+    /* clear cart button */
+    .btn-clear {
+      background: none;
+      border: 2px solid #e53935;
+      color: #e53935;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 0.85rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+    }
+
+    .btn-clear:hover {
+      background: #e53935;
+      color: #fff;
+    }
+
+    /* localStorage badge */
+    .storage-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.72rem;
+      color: #27ae60;
+      background: #eafaf1;
+      border-radius: 20px;
+      padding: 3px 10px;
+      font-weight: bold;
+    }
+
+    /* responsive */
+    @media (max-width: 600px) {
+      .layout { flex-direction: column; }
+
+      .cart-table th:nth-child(3),
+      .cart-table td:nth-child(3) { display: none; } /* hide qty col on very small */
+
+      h1 { font-size: 1.4rem; }
+    }
+
+  </style>
+</head>
+<body>
+
+  <h1>🛒 Shopping Cart Calculator</h1>
+  <p class="subtitle">Add products, track totals — data saved automatically</p>
+
+  <div class="layout">
+
+    <!-- INPUT PANEL -->
+    <div class="input-panel">
+      <h2>➕ Add Product</h2>
+
+      <label for="productName">Product Name</label>
+      <input type="text" id="productName" placeholder="e.g. Notebook" />
+
+      <label for="productPrice">Price (₹)</label>
+      <input type="number" id="productPrice" placeholder="e.g. 120" min="0" />
+
+      <label for="productQty">Quantity</label>
+      <input type="number" id="productQty" placeholder="e.g. 2" min="1" value="1" />
+
+      <button class="btn-add" onclick="addToCart()">Add to Cart</button>
+      <p class="error-msg" id="errorMsg">⚠️ Please fill in all fields correctly.</p>
+    </div>
+
+    <!-- CART PANEL -->
+    <div class="cart-panel">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;">
+        <h2>🧾 Cart Items</h2>
+        <span class="storage-badge">💾 Auto-saved</span>
+      </div>
+
+      <!-- cart table -->
+      <div style="overflow-x:auto;">
+        <table class="cart-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Product</th>
+              <th>Qty</th>
+              <th>Price</th>
+              <th>Total</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody id="cartBody">
+            <!-- rows injected by JS -->
+          </tbody>
+        </table>
+        <p class="empty-msg" id="emptyMsg">Your cart is empty. Add some products!</p>
+      </div>
+
+      <!-- summary bar -->
+      <div class="summary">
+        <div class="summary-item">
+          <span class="summary-label">Total Items</span>
+          <span class="summary-value" id="totalItems">0</span>
+        </div>
+        <div class="summary-item">
+          <span class="summary-label">Products</span>
+          <span class="summary-value" id="totalProducts">0</span>
+        </div>
+        <div class="summary-item grand-total">
+          <span class="summary-label">Grand Total</span>
+          <span class="summary-value" id="grandTotal">₹0.00</span>
+        </div>
+        <button class="btn-clear" onclick="clearCart()">🗑 Clear All</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+
+    // ── load cart from localStorage on page load ──
+    let cart = JSON.parse(localStorage.getItem("shopping-cart")) || [];
+
+    // render whatever is already saved
+    renderCart();
+
+    // ── ADD TO CART ──
+    function addToCart() {
+      const nameInput  = document.getElementById("productName");
+      const priceInput = document.getElementById("productPrice");
+      const qtyInput   = document.getElementById("productQty");
+      const errorMsg   = document.getElementById("errorMsg");
+
+      const name  = nameInput.value.trim();
+      const price = parseFloat(priceInput.value);
+      const qty   = parseInt(qtyInput.value);
+
+      // validate inputs
+      if (!name || isNaN(price) || price < 0 || isNaN(qty) || qty < 1) {
+        errorMsg.style.display = "block";
+        return;
+      }
+
+      errorMsg.style.display = "none";
+
+      // check if same product already in cart — increase qty instead
+      const existing = cart.find(item => item.name.toLowerCase() === name.toLowerCase());
+      if (existing) {
+        existing.qty   += qty;
+        existing.total  = existing.price * existing.qty;
+      } else {
+        cart.push({
+          id:    Date.now(),
+          name,
+          price,
+          qty,
+          total: price * qty
+        });
+      }
+
+      // save to localStorage
+      localStorage.setItem("shopping-cart", JSON.stringify(cart));
+
+      // clear inputs
+      nameInput.value  = "";
+      priceInput.value = "";
+      qtyInput.value   = "1";
+      nameInput.focus();
+
+      renderCart();
+    }
+
+    // ── DELETE ONE ITEM ──
+    function deleteItem(id) {
+      cart = cart.filter(item => item.id !== id);
+      localStorage.setItem("shopping-cart", JSON.stringify(cart));
+      renderCart();
+    }
+
+    // ── CLEAR ENTIRE CART ──
+    function clearCart() {
+      if (cart.length === 0) return;
+      if (confirm("Are you sure you want to clear the entire cart?")) {
+        cart = [];
+        localStorage.removeItem("shopping-cart");
+        renderCart();
+      }
+    }
+
+    // ── RENDER CART TABLE ──
+    function renderCart() {
+      const tbody      = document.getElementById("cartBody");
+      const emptyMsg   = document.getElementById("emptyMsg");
+      const totalItems = document.getElementById("totalItems");
+      const totalProds = document.getElementById("totalProducts");
+      const grandTotal = document.getElementById("grandTotal");
+
+      tbody.innerHTML = "";
+
+      if (cart.length === 0) {
+        emptyMsg.style.display = "block";
+      } else {
+        emptyMsg.style.display = "none";
+
+        cart.forEach((item, index) => {
+          const row = document.createElement("tr");
+          row.innerHTML = `
+            <td>${index + 1}</td>
+            <td>${item.name}</td>
+            <td>${item.qty}</td>
+            <td>₹${item.price.toFixed(2)}</td>
+            <td class="item-total">₹${item.total.toFixed(2)}</td>
+            <td>
+              <button class="btn-delete" onclick="deleteItem(${item.id})">✕</button>
+            </td>
+          `;
+          tbody.appendChild(row);
+        });
+      }
+
+      // update summary
+      const sumQty   = cart.reduce((acc, item) => acc + item.qty, 0);
+      const sumTotal = cart.reduce((acc, item) => acc + item.total, 0);
+
+      totalItems.textContent = sumQty;
+      totalProds.textContent = cart.length;
+      grandTotal.textContent = "₹" + sumTotal.toFixed(2);
+    }
+
+    // ── allow Enter key to add product ──
+    document.addEventListener("keydown", function(e) {
+      if (e.key === "Enter") addToCart();
+    });
+
+  </script>
+
+</body>
+</html>

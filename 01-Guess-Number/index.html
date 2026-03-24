@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Guess the Number Game</title>
+  <style>
+
+    /* basic reset */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f0f4f8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      padding: 20px;
+    }
+
+    /* main game card */
+    .game-card {
+      background-color: #ffffff;
+      border-radius: 14px;
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.1);
+      padding: 36px 32px;
+      max-width: 440px;
+      width: 100%;
+      text-align: center;
+    }
+
+    /* title */
+    .game-card h1 {
+      font-size: 1.7rem;
+      color: #1a73e8;
+      margin-bottom: 6px;
+    }
+
+    .game-card .subtitle {
+      font-size: 0.9rem;
+      color: #888;
+      margin-bottom: 28px;
+    }
+
+    /* input field */
+    input[type="number"] {
+      width: 100%;
+      padding: 11px 14px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      background-color: #f9f9f9;
+      color: #333;
+      text-align: center;
+      margin-bottom: 14px;
+      outline: none;
+      transition: border-color 0.2s;
+    }
+
+    input[type="number"]:focus {
+      border-color: #1a73e8;
+      background-color: #fff;
+    }
+
+    /* buttons */
+    .btn {
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      margin-bottom: 10px;
+    }
+
+    .btn-check {
+      background-color: #1a73e8;
+      color: white;
+    }
+
+    .btn-check:hover {
+      background-color: #1558b0;
+      transform: scale(1.02);
+    }
+
+    .btn-reset {
+      background-color: #e8f0fe;
+      color: #1a73e8;
+    }
+
+    .btn-reset:hover {
+      background-color: #d0e2ff;
+      transform: scale(1.02);
+    }
+
+    /* feedback message box */
+    .message-box {
+      margin: 18px 0;
+      padding: 14px;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      min-height: 50px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* message colors */
+    .msg-high    { background-color: #fdecea; color: #c0392b; }
+    .msg-low     { background-color: #fff8e1; color: #e67e22; }
+    .msg-correct { background-color: #e6f4ea; color: #27ae60; }
+    .msg-default { background-color: #f0f4f8; color: #888; }
+
+    /* attempts counter */
+    .attempts {
+      font-size: 0.88rem;
+      color: #666;
+      margin-bottom: 6px;
+    }
+
+    .attempts span {
+      font-weight: bold;
+      color: #1a73e8;
+    }
+
+    /* hint range text */
+    .range-hint {
+      font-size: 0.82rem;
+      color: #aaa;
+      margin-bottom: 18px;
+    }
+
+    /* history list */
+    .history-title {
+      font-size: 0.8rem;
+      color: #aaa;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-top: 18px;
+      margin-bottom: 8px;
+    }
+
+    .history-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 7px;
+      justify-content: center;
+    }
+
+    .history-tag {
+      background-color: #f0f4f8;
+      border-radius: 20px;
+      padding: 3px 12px;
+      font-size: 0.82rem;
+      color: #555;
+    }
+
+    /* responsive */
+    @media (max-width: 480px) {
+      .game-card {
+        padding: 24px 18px;
+      }
+      .game-card h1 {
+        font-size: 1.4rem;
+      }
+    }
+
+  </style>
+</head>
+<body>
+
+  <div class="game-card">
+    <h1>🎯 Guess the Number</h1>
+    <p class="subtitle">I'm thinking of a number between 1 and 100</p>
+
+    <!-- range hint updates as guesses narrow it down -->
+    <p class="range-hint" id="rangeHint">Range: 1 – 100</p>
+
+    <!-- input -->
+    <input
+      type="number"
+      id="guessInput"
+      placeholder="Enter your guess..."
+      min="1"
+      max="100"
+    />
+
+    <!-- check button -->
+    <button class="btn btn-check" onclick="checkGuess()">Check Guess</button>
+
+    <!-- feedback message -->
+    <div class="message-box msg-default" id="messageBox">
+      Enter a number and click Check Guess!
+    </div>
+
+    <!-- attempts counter -->
+    <p class="attempts">Attempts: <span id="attemptCount">0</span></p>
+
+    <!-- reset button -->
+    <button class="btn btn-reset" onclick="resetGame()">🔄 Play Again</button>
+
+    <!-- guess history -->
+    <p class="history-title" id="historyTitle"></p>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <script>
+
+    // generate random number between 1 and 100
+    let secretNumber = Math.floor(Math.random() * 100) + 1;
+    let attempts     = 0;
+    let gameOver     = false;
+    let lowBound     = 1;
+    let highBound    = 100;
+    let guessHistory = [];
+
+    function checkGuess() {
+      // if game already won, do nothing
+      if (gameOver) return;
+
+      const input     = document.getElementById("guessInput");
+      const msgBox    = document.getElementById("messageBox");
+      const countEl   = document.getElementById("attemptCount");
+      const rangeEl   = document.getElementById("rangeHint");
+      const userGuess = parseInt(input.value);
+
+      // validate input
+      if (isNaN(userGuess) || userGuess < 1 || userGuess > 100) {
+        msgBox.textContent = "⚠️ Please enter a valid number between 1 and 100.";
+        msgBox.className   = "message-box msg-default";
+        return;
+      }
+
+      // count the attempt
+      attempts++;
+      countEl.textContent = attempts;
+      guessHistory.push(userGuess);
+      updateHistory();
+
+      if (userGuess > secretNumber) {
+        // too high
+        msgBox.textContent = "📈 Too High! Try a lower number.";
+        msgBox.className   = "message-box msg-high";
+        if (userGuess < highBound) highBound = userGuess - 1;
+
+      } else if (userGuess < secretNumber) {
+        // too low
+        msgBox.textContent = "📉 Too Low! Try a higher number.";
+        msgBox.className   = "message-box msg-low";
+        if (userGuess > lowBound) lowBound = userGuess + 1;
+
+      } else {
+        // correct!
+        msgBox.textContent = "🎉 Correct Guess! You got it in " + attempts + " attempt(s)!";
+        msgBox.className   = "message-box msg-correct";
+        gameOver = true;
+      }
+
+      // update the range hint
+      rangeEl.textContent = "Range: " + lowBound + " – " + highBound;
+
+      // clear input
+      input.value = "";
+      input.focus();
+    }
+
+    function resetGame() {
+      // generate a fresh number
+      secretNumber = Math.floor(Math.random() * 100) + 1;
+      attempts     = 0;
+      gameOver     = false;
+      lowBound     = 1;
+      highBound    = 100;
+      guessHistory = [];
+
+      // reset UI
+      document.getElementById("attemptCount").textContent = "0";
+      document.getElementById("guessInput").value         = "";
+      document.getElementById("rangeHint").textContent    = "Range: 1 – 100";
+      document.getElementById("historyList").innerHTML    = "";
+      document.getElementById("historyTitle").textContent = "";
+
+      const msgBox      = document.getElementById("messageBox");
+      msgBox.textContent = "Enter a number and click Check Guess!";
+      msgBox.className   = "message-box msg-default";
+
+      document.getElementById("guessInput").focus();
+    }
+
+    function updateHistory() {
+      const list  = document.getElementById("historyList");
+      const title = document.getElementById("historyTitle");
+      title.textContent = "Your Guesses";
+      list.innerHTML = "";
+      guessHistory.forEach(function(g) {
+        const tag = document.createElement("span");
+        tag.className   = "history-tag";
+        tag.textContent = g;
+        list.appendChild(tag);
+      });
+    }
+
+    // allow pressing Enter key to submit guess
+    document.getElementById("guessInput").addEventListener("keydown", function(e) {
+      if (e.key === "Enter") checkGuess();
+    });
+
+  </script>
+
+</body>
+</html>
