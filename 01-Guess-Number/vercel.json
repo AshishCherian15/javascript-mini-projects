@@ -1,0 +1,11 @@
+{
+  "name": "guess-the-number-game",
+  "version": 2,
+  "buildCommand": "",
+  "devCommand": "",
+  "framework": null,
+  "projectSettings": {
+    "outputDirectory": null,
+    "rootDirectory": null
+  }
+}
